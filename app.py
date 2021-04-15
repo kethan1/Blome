@@ -35,10 +35,12 @@ def disconnect():
 def handle_client_connect_event(data):
     if data["username"] not in players:
         players[data["username"]] = {
-            "x": 255, 
-            "y": 255, 
+            "x": 225, 
+            "y": 225, 
             "bullets": [], 
             "health": 100,
+            "dead": False,
+            "kills": 0,
             "sid": request.sid
         }
     emit("get_player_positions", players, broadcast=True)
@@ -46,8 +48,6 @@ def handle_client_connect_event(data):
 @socketio.on("get_player_positions")
 def get_player_positions():
     emit("get_player_positions", players)
-
-
 
 @socketio.on("update_user_pos")
 def update_user_pos(data):
@@ -69,6 +69,22 @@ def update_user_pos(data):
 @socketio.on("player_hit")
 def player_hit(data):
     print(data)
+    if data["username"] in players:
+        players[data["hitUser"]]["health"] -= 10
+        if players[data["hitUser"]]["health"] <= 0:
+            players[data["hitUser"]]["dead"] = True
+            players[data["username"]]["kills"] = 1
+            print(1)
+    emit("get_player_positions", players, broadcast=True)
+
+@socketio.on("respawn")
+def respawn(data):
+    players[data["username"]]["x"] = 225
+    players[data["username"]]["y"] = 225
+    players[data["username"]]["health"] = 100
+    players[data["username"]]["bullets"] = []
+    players[data["username"]]["dead"] = False
+    players[data["username"]]["kills"] = 0
     emit("get_player_positions", players, broadcast=True)
     
 
