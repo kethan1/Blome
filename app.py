@@ -1,6 +1,8 @@
 from flask import *
 from flask_socketio import SocketIO, emit
+from engineio.payload import Payload
 
+Payload.max_decode_packets = 50
 app = Flask(__name__)
 app.secret_key = r'\x11\xca\x1f\x89X\x18\xe4\xa0p\x94\xce\xf8\xdf\x87v\xa7\xf2P\xd4\x87#!\xa8"'
 socketio = SocketIO(app)
@@ -68,13 +70,11 @@ def update_user_pos(data):
 
 @socketio.on("player_hit")
 def player_hit(data):
-    print(data)
     if data["username"] in players:
         players[data["hitUser"]]["health"] -= 10
         if players[data["hitUser"]]["health"] <= 0:
             players[data["hitUser"]]["dead"] = True
-            players[data["username"]]["kills"] = 1
-            print(1)
+            players[data["username"]]["kills"]+=1
     emit("get_player_positions", players, broadcast=True)
 
 @socketio.on("respawn")
@@ -85,6 +85,7 @@ def respawn(data):
     players[data["username"]]["bullets"] = []
     players[data["username"]]["dead"] = False
     players[data["username"]]["kills"] = 0
+    print(1)
     emit("get_player_positions", players, broadcast=True)
     
 

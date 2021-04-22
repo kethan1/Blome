@@ -1,11 +1,11 @@
 var player_pos = [225, 225];
 var square_size = 40;
-var speed = 3;
+var speed = 5;
 var playersJson = {};
 var username = document.querySelector('meta[name="username"]').content;
 var bullets = [];
 var bulletImage;
-var lastTimeShot = null;
+var lastTimeShot = null; 
 var bulletShootTime = 0.7;
 var health = 100;
 var progressBarSize = 55;
@@ -19,6 +19,7 @@ socket.on('connect', function() {
 
 socket.on('get_player_positions', function(data) {
     playersJson = data
+    console.log(1)
 });
 
 socket.on('update_user_pos', function(data) {
@@ -166,7 +167,7 @@ function draw() {
     var bullets2 = bullets.filter((bullet) => {
         return (bullet[0] < 450)
     })
-    if (bullets2.length != bullets.length) {
+    if (bullets2.length !== bullets.length) {
         bullets = bullets2
         update_user_pos()
     }
@@ -176,7 +177,7 @@ function keyPressed() {
     if (health > 0) {
         if (keyCode == 32) {
             if (calculateTimeSinceLastShot()) {
-                var dir = createVector(mouseX-player_pos[0]+square_size, mouseY-player_pos[1]+(square_size/2)).normalize();
+                var dir = createVector(mouseX-(player_pos[0]+square_size), mouseY-(player_pos[1]+(square_size/2))).normalize();
                 bullets.push([
                     player_pos[0]+square_size, 
                     player_pos[1]+(square_size/2),
@@ -193,7 +194,7 @@ function keyPressed() {
 function mouseClicked() {
     if (health > 0) {
         if (calculateTimeSinceLastShot()) {
-            var dir = createVector(mouseX-player_pos[0]+square_size, mouseY-player_pos[1]+(square_size/2)).normalize();
+            var dir = createVector(mouseX-(player_pos[0]+square_size), mouseY-(player_pos[1]+(square_size/2))).normalize();
             bullets.push([
                 player_pos[0]+square_size, 
                 player_pos[1]+(square_size/2),
