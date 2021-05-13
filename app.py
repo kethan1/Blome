@@ -28,7 +28,11 @@ def home():
     if request.method == "GET":
         return render_template("game.html")
     elif request.method == "POST":
-        return render_template("game.html", username = request.form["username"])
+        if request.form["username"] not in players:
+            return render_template("game.html", username = request.form["username"])
+        else:
+            flash("Username Taken")
+            return redirect("/")
 
 
 @socketio.on("connect")

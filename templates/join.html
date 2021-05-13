@@ -9,6 +9,18 @@
     <link rel="icon" type="image/png" href="/static/images/favicon.png" />
 </head>
 <body>
+    {% with messages = get_flashed_messages() %} 
+        {% if messages %} 
+            {% for message in messages %}
+                <script>
+                    M.toast({
+                        html: '<span>{{ message }}</span><button class="btn-flat toast-action" style="color: white;" onclick="M.Toast.dismissAll();">X</button>',
+                        classes: 'rounded'
+                    })
+                </script>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     <form action="/game" method="POST">
         <div class="container input-field">
             <input id="username" name="username" type="text" class="validate">

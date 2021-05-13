@@ -161,7 +161,6 @@ function draw() {
                     }
                 }
             }
-            
         }
     }
     var bullets2 = bullets.filter((bullet) => {
