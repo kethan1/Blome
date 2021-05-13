@@ -1,3 +1,5 @@
+import os
+
 from flask import *
 from flask_socketio import SocketIO, emit
 from engineio.payload import Payload
@@ -8,6 +10,14 @@ app.secret_key = r'\x11\xca\x1f\x89X\x18\xe4\xa0p\x94\xce\xf8\xdf\x87v\xa7\xf2P\
 socketio = SocketIO(app)
 
 players = {}
+
+@app.before_request
+def before_request():
+    if 'DYNO' in os.environ: # Only runs when on heroku
+        if request.url.startswith('http://'):
+            url = request.url.replace('http://', 'https://', 1)
+            code = 301
+            return redirect(url, code=code)
 
 @app.route("/")
 def join():
