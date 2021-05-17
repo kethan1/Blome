@@ -42,10 +42,10 @@ function setBulletTime() {
 }
 
 function calculateTimeSinceLastShot() {
-    if (lastTimeShot !== null) {
-        if (((new Date().getTime() - lastTimeShot)/1000) >= bulletShootTime) return true
-    } else return true
-    return false
+    if (lastTimeShot === null) {
+        return true
+    }
+    return (((new Date().getTime() - lastTimeShot)/1000) >= bulletShootTime)
 }
 
 function respawn() {
