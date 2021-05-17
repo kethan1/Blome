@@ -92,7 +92,7 @@ function draw() {
         else player_pos[1] = 450-square_size
         update_user_pos()
     }
-    if (!value["dead"]) {
+    if (health > 0) {
         square(player_pos[0], player_pos[1], square_size);
         textSize(14);
         fill(255, 255, 255);
@@ -164,7 +164,7 @@ function draw() {
 }
 
 function keyPressed() {
-    if (!value["dead"]) {
+    if (health > 0) {
         if (keyCode == 32) {
             if (calculateTimeSinceLastShot()) {
                 var dir = createVector(mouseX-(player_pos[0]+square_size), mouseY-(player_pos[1]+(square_size/2))).normalize();
