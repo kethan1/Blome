@@ -4,7 +4,7 @@ from flask import *
 from flask_socketio import SocketIO, emit
 from engineio.payload import Payload
 
-Payload.max_decode_packets = 50
+Payload.max_decode_packets = 500
 app = Flask(__name__)
 app.secret_key = r'\x11\xca\x1f\x89X\x18\xe4\xa0p\x94\xce\xf8\xdf\x87v\xa7\xf2P\xd4\x87#!\xa8"'
 socketio = SocketIO(app)
@@ -99,7 +99,6 @@ def respawn(data):
     players[data["username"]]["bullets"] = []
     players[data["username"]]["dead"] = False
     players[data["username"]]["kills"] = 0
-    print(1)
     emit("get_player_positions", players, broadcast=True)
     
 
