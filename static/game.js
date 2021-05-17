@@ -45,7 +45,7 @@ function calculateTimeSinceLastShot() {
     if (lastTimeShot === null) {
         return true
     }
-    return (((new Date().getTime() - lastTimeShot)/1000) >= bulletShootTime)
+    return ((new Date().getTime() - lastTimeShot)/1000 >= bulletShootTime)
 }
 
 function respawn() {
@@ -92,7 +92,7 @@ function draw() {
         else player_pos[1] = 450-square_size
         update_user_pos()
     }
-    if (health > 0) {
+    if (!value["dead"]) {
         square(player_pos[0], player_pos[1], square_size);
         textSize(14);
         fill(255, 255, 255);
@@ -164,7 +164,7 @@ function draw() {
 }
 
 function keyPressed() {
-    if (value["dead"] === true) {
+    if (!value["dead"]) {
         if (keyCode == 32) {
             if (calculateTimeSinceLastShot()) {
                 var dir = createVector(mouseX-(player_pos[0]+square_size), mouseY-(player_pos[1]+(square_size/2))).normalize();
