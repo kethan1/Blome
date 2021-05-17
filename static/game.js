@@ -9,6 +9,7 @@ var lastTimeShot = null;
 var bulletShootTime = 0.7;
 var health = 100;
 var progressBarSize = 55;
+var button;
 globalThis.socket = io();
 
 socket.on('connect', function() {
@@ -19,7 +20,6 @@ socket.on('connect', function() {
 
 socket.on('get_player_positions', function(data) {
     playersJson = data
-    console.log(1)
 });
 
 socket.on('update_user_pos', function(data) {
@@ -38,23 +38,13 @@ function update_user_pos() {
 }
 
 function setBulletTime() {
-    var d = new Date();
-    var n = d.getTime();
-    lastTimeShot = n;
+    lastTimeShot = new Date().getTime();
 }
 
 function calculateTimeSinceLastShot() {
-    var timeSinceLastShot;
-    if (lastTimeShot != null) {
-        var d = new Date();
-        var n = d.getTime();
-        timeSinceLastShot = (n - lastTimeShot)/1000
-    } else {
-        timeSinceLastShot = bulletShootTime
-    }
-    if (timeSinceLastShot >= bulletShootTime) {
-        return true
-    }
+    if (lastTimeShot !== null) {
+        if (((new Date().getTime() - lastTimeShot)/1000) >= bulletShootTime) return true
+    } else return true
     return false
 }
 
@@ -64,6 +54,7 @@ function respawn() {
     });
     health = 100
     player_pos = [225, 225];
+    button.remove()
 }
 
 socket.emit("get_player_positions")
@@ -150,7 +141,7 @@ function draw() {
         bullets[index] = [bullet[0] + (bullet[2] * 4), bullet[1] + (bullet[3] * 4), bullet[2], bullet[3]]
         update_user_pos()
         for (let [key, value] of Object.entries(playersJson)) {
-            if (key !== username && value["dead"] != true) {
+            if (key !== username && value["dead"] !== true) {
                 if (value["x"] < bullet[0] && bullet[0] < value["x"]+square_size) {
                     if (value["y"] < bullet[1] && bullet[1] < value["y"]+square_size) {
                         socket.emit("player_hit", {
@@ -173,7 +164,7 @@ function draw() {
 }
 
 function keyPressed() {
-    if (health > 0) {
+    if (value["dead"] === true) {
         if (keyCode == 32) {
             if (calculateTimeSinceLastShot()) {
                 var dir = createVector(mouseX-(player_pos[0]+square_size), mouseY-(player_pos[1]+(square_size/2))).normalize();
@@ -203,7 +194,5 @@ function mouseClicked() {
             setBulletTime()
             update_user_pos()
         }
-    } else {
-
     }
 }
