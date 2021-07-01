@@ -1,6 +1,6 @@
 import os
 
-from flask import *
+from flask import Flask, render_template, redirect, request, flash
 from flask_socketio import SocketIO, emit
 from engineio.payload import Payload
 
@@ -11,17 +11,20 @@ socketio = SocketIO(app)
 
 players = {}
 
+
 @app.before_request
 def before_request():
-    if 'DYNO' in os.environ: # Only runs when on heroku
+    if 'DYNO' in os.environ:  # Only runs when on heroku
         if request.url.startswith('http://'):
             url = request.url.replace('http://', 'https://', 1)
             code = 301
             return redirect(url, code=code)
 
+
 @app.route("/")
 def join():
     return render_template("join.html")
+
 
 @app.route("/game", methods=["GET", "POST"])
 def home():
@@ -29,15 +32,22 @@ def home():
         return render_template("game.html")
     elif request.method == "POST":
         if request.form["username"] not in players:
-            return render_template("game.html", username = request.form["username"])
+            return render_template("game.html", username=request.form["username"])
         else:
             flash("Username Taken")
             return redirect("/")
 
 
+@app.route("/username_taken")
+def username_taken():
+    flash("Username Taken")
+    return redirect("/")
+
+
 @socketio.on("connect")
 def connect():
     pass
+
 
 @socketio.on("disconnect")
 def disconnect():
@@ -47,23 +57,33 @@ def disconnect():
             players.pop(player)
     emit("get_player_positions", players, broadcast=True)
 
+
 @socketio.on("client_connected")
 def handle_client_connect_event(data):
     if data["username"] not in players:
         players[data["username"]] = {
-            "x": 225, 
-            "y": 225, 
-            "bullets": [], 
+            "x": 225,
+            "y": 225,
+            "bullets": [],
             "health": 100,
             "dead": False,
             "kills": 0,
             "sid": request.sid
         }
-    emit("get_player_positions", players, broadcast=True)
+        emit("get_player_positions", players, broadcast=True)
+        emit("client_connected", {
+            "success": True
+        })
+    else:
+        emit("client_connected", {
+            "success": False
+        })
+
 
 @socketio.on("get_player_positions")
 def get_player_positions():
     emit("get_player_positions", players)
+
 
 @socketio.on("update_user_pos")
 def update_user_pos(data):
@@ -82,14 +102,16 @@ def update_user_pos(data):
             "error": "username taken"
         })
 
+
 @socketio.on("player_hit")
 def player_hit(data):
     if data["username"] in players:
         players[data["hitUser"]]["health"] -= 10
         if players[data["hitUser"]]["health"] <= 0:
             players[data["hitUser"]]["dead"] = True
-            players[data["username"]]["kills"]+=1
+            players[data["username"]]["kills"] += 1
     emit("get_player_positions", players, broadcast=True)
+
 
 @socketio.on("respawn")
 def respawn(data):
@@ -100,7 +122,7 @@ def respawn(data):
     players[data["username"]]["dead"] = False
     players[data["username"]]["kills"] = 0
     emit("get_player_positions", players, broadcast=True)
-    
+
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)

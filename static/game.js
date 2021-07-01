@@ -18,14 +18,16 @@ socket.on('connect', function() {
     });
 });
 
+socket.on('client_connected', function(success) {
+    if (!success) window.location.href = "/username_taken";
+});
+
 socket.on('get_player_positions', function(data) {
     playersJson = data
 });
 
 socket.on('update_user_pos', function(data) {
-    if (!data["success"]) {
-        console.log(data["error"])
-    }
+    if (!data["success"]) console.log(data["error"])
 })
 
 function update_user_pos() {
@@ -60,37 +62,37 @@ function respawn() {
 socket.emit("get_player_positions")
 
 function setup() {
-    canvas = createCanvas(450, 450)
+    globalThis.canvas = createCanvas(450, 450);
     canvas.parent("p5jscanvas");
     textAlign(CENTER, CENTER);
 }
 
 function preload() {
-    bulletImage = loadImage('/static/images/bullet.png')
+    bulletImage = loadImage('/static/images/bullet.png');
 }
 
 function draw() {
     clear();
     background(0, 0, 0);
     if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) {
-        if (player_pos[0] > 0) player_pos[0]-=speed
-        else player_pos[0] = 0
-        update_user_pos()
+        if (player_pos[0] > 0) player_pos[0]-=speed;
+        else player_pos[0] = 0;
+        update_user_pos();
     }
     if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) {
-        if (player_pos[0] < 450-square_size) player_pos[0]+=speed
-        else player_pos[0] = 450-square_size
-        update_user_pos()
+        if (player_pos[0] < 450-square_size) player_pos[0]+=speed;
+        else player_pos[0] = 450-square_size;
+        update_user_pos();
     }
     if (keyIsDown(UP_ARROW) || keyIsDown(87)) {
-        if (player_pos[1] > 0) player_pos[1]-=speed
-        else player_pos[1] = 0
-        update_user_pos()
+        if (player_pos[1] > 0) player_pos[1]-=speed;
+        else player_pos[1] = 0;
+        update_user_pos();
     }
     if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) {
-        if (player_pos[1] < 450-square_size) player_pos[1]+=speed
-        else player_pos[1] = 450-square_size
-        update_user_pos()
+        if (player_pos[1] < 450-square_size) player_pos[1]+=speed;
+        else player_pos[1] = 450-square_size;
+        update_user_pos();
     }
     if (health > 0) {
         square(player_pos[0], player_pos[1], square_size);
