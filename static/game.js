@@ -19,7 +19,10 @@ socket.on('connect', function() {
 });
 
 socket.on('client_connected', function(success) {
-    if (!success) window.location.href = "/username_taken";
+    if (!success["success"]) {
+        if (!success["invalid"]) window.location.replace("/username_taken");
+        else window.location.replace("/invalid_username");
+    }
 });
 
 socket.on('get_player_positions', function(data) {

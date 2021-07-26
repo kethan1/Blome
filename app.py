@@ -44,6 +44,12 @@ def username_taken():
     return redirect("/")
 
 
+@app.route("/invalid_username")
+def invalid_username():
+    flash("Invalid Username")
+    return redirect("/")
+
+
 @socketio.on("connect")
 def connect():
     pass
@@ -60,7 +66,8 @@ def disconnect():
 
 @socketio.on("client_connected")
 def handle_client_connect_event(data):
-    if data["username"] not in players:
+    print(data["username"], "username")
+    if data["username"] not in players and data["username"].strip() != "":
         players[data["username"]] = {
             "x": 225,
             "y": 225,
@@ -75,8 +82,10 @@ def handle_client_connect_event(data):
             "success": True
         })
     else:
+        print(1)
         emit("client_connected", {
-            "success": False
+            "success": False,
+            "invalid": not bool(data["username"].strip())
         })
 
 
