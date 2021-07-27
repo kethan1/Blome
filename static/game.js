@@ -137,14 +137,14 @@ function draw() {
             text(value["health"], (value["x"]+((square_size/2)+2)), value["y"]-10);
             for (let bullet of value["bullets"]) image(bulletImage, bullet[0], bullet[1]);
         } else if (key === username && value != null) {
-            health = value["health"]
+            health = value["health"];
         }
     }
 
     for (let [index, bullet] of bullets.entries()) {
         image(bulletImage, bullet[0], bullet[1]);
-        bullets[index] = [bullet[0] + (bullet[2] * 4), bullet[1] + (bullet[3] * 4), bullet[2], bullet[3]]
-        update_user_pos()
+        bullets[index] = [bullet[0] + (bullet[2] * 4), bullet[1] + (bullet[3] * 4), bullet[2], bullet[3]];
+        update_user_pos();
         for (let [key, value] of Object.entries(playersJson)) {
             if (key !== username && value["dead"] !== true) {
                 if (value["x"] < bullet[0] && bullet[0] < value["x"]+square_size) {
@@ -153,18 +153,18 @@ function draw() {
                             "username": username,
                             "hitUser": key
                         });
-                        bullets[index][0] = 475
+                        bullets[index][0] = 475;
                     }
                 }
             }
         }
     }
     var bullets2 = bullets.filter((bullet) => {
-        return (bullet[0] < 450)
+        return bullet[0] < 450;
     })
     if (bullets2.length !== bullets.length) {
-        bullets = bullets2
-        update_user_pos()
+        bullets = bullets2;
+        update_user_pos();
     }
 }
 
@@ -178,9 +178,9 @@ function keyPressed() {
                     player_pos[1]+(square_size/2),
                     dir.x,
                     dir.y
-                ])
-                setBulletTime()
-                update_user_pos()
+                ]);
+                setBulletTime();
+                update_user_pos();
             }
         }
     }
@@ -195,9 +195,9 @@ function mouseClicked() {
                 player_pos[1]+(square_size/2),
                 dir.x,
                 dir.y
-            ])
-            setBulletTime()
-            update_user_pos()
+            ]);
+            setBulletTime();
+            update_user_pos();
         }
     }
 }
