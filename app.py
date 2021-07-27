@@ -28,14 +28,18 @@ def join():
 
 @app.route("/game", methods=["GET", "POST"])
 def home():
-    if request.method == "GET":
-        return render_template("game.html")
-    elif request.method == "POST":
+    if request.method == "POST":
+        print(request.form["username"], "theUsername")
         if request.form["username"] not in players:
             return render_template("game.html", username=request.form["username"])
+        elif not request.form["username"].strip():
+            flash("Invalid Username")
         else:
             flash("Username Taken")
-            return redirect("/")
+        return redirect("/")
+    else:
+        flash("Please Login Before Playing")
+        return redirect("/")
 
 
 @app.route("/username_taken")
@@ -66,7 +70,6 @@ def disconnect():
 
 @socketio.on("client_connected")
 def handle_client_connect_event(data):
-    print(data["username"], "username")
     if data["username"] not in players and data["username"].strip() != "":
         players[data["username"]] = {
             "x": 225,
@@ -82,7 +85,6 @@ def handle_client_connect_event(data):
             "success": True
         })
     else:
-        print(1)
         emit("client_connected", {
             "success": False,
             "invalid": not bool(data["username"].strip())
