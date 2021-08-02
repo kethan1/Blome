@@ -1,4 +1,0 @@
-flask
-flask-socketio
-gunicorn
-eventlet==0.30.2

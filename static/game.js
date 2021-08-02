@@ -71,7 +71,7 @@ function setup() {
 }
 
 function preload() {
-    bulletImage = loadImage('/static/images/bullet.png');
+    bulletImage = loadImage('/images/bullet.png');
 }
 
 function draw() {

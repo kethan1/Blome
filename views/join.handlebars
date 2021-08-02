@@ -1,0 +1,22 @@
+{{#section 'head'}}
+    <title>Login to Blome</title>
+{{/section}}
+
+{{#if messages}}
+    {{#each messages}}
+        <script>
+            M.toast({
+                html: '<span>{{ this }}</span><button class="btn-flat toast-action" style="color: white;" onclick="M.Toast.dismissAll();">X</button>',
+                classes: 'rounded'
+            })
+        </script>
+    {{/each}}
+{{/if}}
+
+<form action="/game" method="POST">
+    <div class="container input-field">
+        <input id="username" name="username" type="text" class="validate">
+        <label for="username">Username</label>
+        <button type="submit" class="waves-effect waves-light btn">Join</button>
+    </div>
+</form>
