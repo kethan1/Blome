@@ -2,7 +2,7 @@ var player_pos = [225, 225];
 var square_size = 40;
 var speed = 5;
 var playersJson = {};
-var username = document.querySelector('meta[name="username"]').content;
+var username = document.querySelector(`meta[name="username"]`).content;
 var bullets = [];
 var bulletImage;
 var lastTimeShot = null; 
@@ -12,28 +12,28 @@ var progressBarSize = 55;
 var button = null;
 globalThis.socket = io();
 
-socket.on('connect', function() {
-    socket.emit('client_connected', {
+socket.on("connect", function() {
+    socket.emit("client_connected", {
         "username": username
     });
 });
 
-socket.on('client_connected', function(success) {
+socket.on("client_connected", function(success) {
     if (!success["success"]) {
         window.location.replace(success["invalid"] ? "/invalid_username": "/username_taken");
     }
 });
 
-socket.on('get_player_positions', function(data) {
+socket.on("get_player_positions", function(data) {
     playersJson = data;
 });
 
-socket.on('update_user_pos', function(data) {
+socket.on("update_user_pos", function(data) {
     if (!data["success"]) console.log(data["error"])
 })
 
 function update_user_pos() {
-    socket.emit('update_user_pos', {
+    socket.emit("update_user_pos", {
         "username": username,
         "x": player_pos[0],
         "y": player_pos[1],
@@ -53,7 +53,7 @@ function calculateTimeSinceLastShot() {
 }
 
 function respawn() {
-    socket.emit('respawn', {
+    socket.emit("respawn", {
         "username": username
     });
     health = 100;
@@ -71,7 +71,7 @@ function setup() {
 }
 
 function preload() {
-    bulletImage = loadImage('/static/images/bullet.png');
+    bulletImage = loadImage("/static/images/bullet.png");
 }
 
 function draw() {
