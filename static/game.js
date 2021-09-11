@@ -9,7 +9,7 @@ var lastTimeShot = null;
 var bulletShootTime = 0.7;
 var health = 100;
 var progressBarSize = 55;
-var button;
+var button = null;
 globalThis.socket = io();
 
 socket.on('connect', function() {
@@ -20,13 +20,12 @@ socket.on('connect', function() {
 
 socket.on('client_connected', function(success) {
     if (!success["success"]) {
-        if (!success["invalid"]) window.location.replace("/username_taken");
-        else window.location.replace("/invalid_username");
+        window.location.replace(success["invalid"] ? "/invalid_username": "/username_taken");
     }
 });
 
 socket.on('get_player_positions', function(data) {
-    playersJson = data
+    playersJson = data;
 });
 
 socket.on('update_user_pos', function(data) {
@@ -48,21 +47,22 @@ function setBulletTime() {
 
 function calculateTimeSinceLastShot() {
     if (lastTimeShot === null) {
-        return true
+        return true;
     }
-    return ((new Date().getTime() - lastTimeShot)/1000 >= bulletShootTime)
+    return ((new Date().getTime() - lastTimeShot)/1000 >= bulletShootTime);
 }
 
 function respawn() {
     socket.emit('respawn', {
         "username": username
     });
-    health = 100
+    health = 100;
     player_pos = [225, 225];
-    button.remove()
+    button.remove();
+    button = null;
 }
 
-socket.emit("get_player_positions")
+socket.emit("get_player_positions");
 
 function setup() {
     globalThis.canvas = createCanvas(450, 450);
@@ -97,29 +97,6 @@ function draw() {
         else player_pos[1] = 450-square_size;
         update_user_pos();
     }
-    if (health > 0) {
-        square(player_pos[0], player_pos[1], square_size);
-        textSize(14);
-        fill(255, 255, 255);
-        text(username, (player_pos[0]+((square_size/2)+2)), player_pos[1]-25);
-        fill(150, 150, 150);
-        rect(player_pos[0] + ((square_size-progressBarSize)/2), player_pos[1]-18, progressBarSize, 15);
-        if (health <= 20) fill(255, 0, 0);
-        else if (health <= 50) fill(255, 255, 0);
-        else fill(0, 255, 0);
-        rect(player_pos[0] + ((square_size-progressBarSize)/2), player_pos[1]-18, health*(progressBarSize/100), 15);
-        fill(255, 255, 255);
-        text(health, (player_pos[0]+((square_size/2)+2)), player_pos[1]-10);
-        fill(255, 255, 255);
-    } else {
-        background(0, 0, 0);
-        textSize(30);
-        fill(255, 255, 255);
-        text("You Died :(", 225-(textWidth("You Died :(")/2), 25);
-        button = createButton("Respawn");
-        button.position(0, 0);
-        button.mousePressed(respawn);
-    }
     
     for (let [key, value] of Object.entries(playersJson)) {
         if (key !== username && value != null && !value["dead"]) {
@@ -138,6 +115,33 @@ function draw() {
             for (let bullet of value["bullets"]) image(bulletImage, bullet[0], bullet[1]);
         } else if (key === username && value != null) {
             health = value["health"];
+        }
+    }
+
+    if (health > 0) {
+        square(player_pos[0], player_pos[1], square_size);
+        textSize(14);
+        fill(255, 255, 255);
+        text(username, (player_pos[0]+((square_size/2)+2)), player_pos[1]-25);
+        fill(150, 150, 150);
+        rect(player_pos[0] + ((square_size-progressBarSize)/2), player_pos[1]-18, progressBarSize, 15);
+        if (health <= 20) fill(255, 0, 0);
+        else if (health <= 50) fill(255, 255, 0);
+        else fill(0, 255, 0);
+        rect(player_pos[0] + ((square_size-progressBarSize)/2), player_pos[1]-18, health*(progressBarSize/100), 15);
+        fill(255, 255, 255);
+        text(health, (player_pos[0]+((square_size/2)+2)), player_pos[1]-10);
+        fill(255, 255, 255);
+    } else {
+        background(0, 0, 0);
+        textSize(30);
+        fill(255, 255, 255);
+        text("You Died", width / 2, 40);
+        if (button === null) {
+            button = createButton("Respawn");
+            button.parent("p5jscanvas");
+            button.position(window.innerWidth / 2 - button.width / 2, height / 2);
+            button.mousePressed(respawn);
         }
     }
 
@@ -174,8 +178,8 @@ function keyPressed() {
             if (calculateTimeSinceLastShot()) {
                 var dir = createVector(mouseX-(player_pos[0]+square_size), mouseY-(player_pos[1]+(square_size/2))).normalize();
                 bullets.push([
-                    player_pos[0]+square_size, 
-                    player_pos[1]+(square_size/2),
+                    player_pos[0] + square_size, 
+                    player_pos[1] + (square_size / 2),
                     dir.x,
                     dir.y
                 ]);
@@ -189,15 +193,21 @@ function keyPressed() {
 function mouseClicked() {
     if (health > 0) {
         if (calculateTimeSinceLastShot()) {
-            var dir = createVector(mouseX-(player_pos[0]+square_size), mouseY-(player_pos[1]+(square_size/2))).normalize();
+            var dir = createVector(mouseX - (player_pos[0] + square_size), mouseY - (player_pos[1] + (square_size / 2))).normalize();
             bullets.push([
-                player_pos[0]+square_size, 
-                player_pos[1]+(square_size/2),
+                player_pos[0] + square_size, 
+                player_pos[1] + (square_size / 2),
                 dir.x,
                 dir.y
             ]);
             setBulletTime();
             update_user_pos();
         }
+    }
+}
+
+function windowResized() {
+    if (button !== null) {
+        button.position(window.innerWidth / 2 - button.width / 2, height / 2);
     }
 }

@@ -14,11 +14,11 @@ players = {}
 
 @app.before_request
 def before_request():
-    if 'DYNO' in os.environ:  # Only runs when on heroku
-        if request.url.startswith('http://'):
-            url = request.url.replace('http://', 'https://', 1)
-            code = 301
-            return redirect(url, code=code)
+    # Only runs when on heroku
+    if 'DYNO' in os.environ and request.url.startswith('http://'):
+        url = request.url.replace('http://', 'https://', 1)
+        code = 301
+        return redirect(url, code=code)
 
 
 @app.route("/")
@@ -29,17 +29,17 @@ def join():
 @app.route("/game", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
-        print(request.form["username"], "theUsername")
-        if request.form["username"] not in players:
-            return render_template("game.html", username=request.form["username"])
-        elif not request.form["username"].strip():
-            flash("Invalid Username")
+        if "username" in request.form and request.form["username"].strip():
+            if request.form["username"] not in players:
+                return render_template("game.html", username=request.form["username"])
+            else:
+                flash("Username Taken")
         else:
-            flash("Username Taken")
-        return redirect("/")
+            flash("Invalid Username")
     else:
         flash("Please Login Before Playing")
-        return redirect("/")
+
+    return redirect("/")
 
 
 @app.route("/username_taken")
@@ -117,7 +117,7 @@ def update_user_pos(data):
 @socketio.on("player_hit")
 def player_hit(data):
     if data["username"] in players:
-        players[data["hitUser"]]["health"] -= 10
+        players[data["hitUser"]]["health"] -= 100
         if players[data["hitUser"]]["health"] <= 0:
             players[data["hitUser"]]["dead"] = True
             players[data["username"]]["kills"] += 1
