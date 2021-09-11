@@ -19,6 +19,7 @@ socket.on('connect', function() {
 });
 
 socket.on('client_connected', function(success) {
+    console.log(1)
     if (!success["success"]) {
         if (!success["invalid"]) window.location.replace("/username_taken");
         else window.location.replace("/invalid_username");
