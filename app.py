@@ -117,7 +117,7 @@ def update_user_pos(data):
 @socketio.on("player_hit")
 def player_hit(data):
     if data["username"] in players:
-        players[data["hitUser"]]["health"] -= 100
+        players[data["hitUser"]]["health"] -= 10
         if players[data["hitUser"]]["health"] <= 0:
             players[data["hitUser"]]["dead"] = True
             players[data["username"]]["kills"] += 1
